@@ -1,11 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import axes3d
 
 n_puntos=300
 
 x=np.linspace(0.0,30.0,n_puntos)
 y=np.linspace(0.0,30.0,n_puntos)
-
 
 
 matriz=np.zeros((n_puntos,n_puntos))
@@ -60,6 +60,11 @@ for j in range(1,n_puntos-1):
 u_pasado=u_inicial.copy()
 u_presente=u_siguiente.copy()
 
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
 
+xGrid, yGrid=np.meshgrid(y,x)
 
+ax.plot_wireframe(xGrid, yGrid, u_presente, rstride=1, cstride=1)
 
+plt.show()
