@@ -60,11 +60,27 @@ for j in range(1,n_puntos-1):
 u_pasado=u_inicial.copy()
 u_presente=u_siguiente.copy()
 
+n_tiempo=60
+for l in range(n_tiempo):
+    for i in range(1,n_puntos-1):
+        for j in range(1,n_puntos-1):
+            u_siguiente[j,i]=(gamma**2)*(u_presente[j,i+1]-2.0*u_presente[j,i]+u_presente[j,i-1])+(beta**2)*(u_presente[j+1,i]-2.0*u_presente[j,i]+u_presente[j-1,i])+2.0*u_presente[j,i]-u_pasado[j,i]
+        u_pasado=u_presente.copy()
+        u_presente=u_siguiente.copy()
+
+
+
+
+
+
+
+#grafica
+
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 
 xGrid, yGrid=np.meshgrid(y,x)
 
-ax.plot_wireframe(xGrid, yGrid, u_presente, rstride=1, cstride=1)
+#ax.plot_wireframe(xGrid, yGrid, u_presente, rstride=1, cstride=1)
 
-plt.show()
+
