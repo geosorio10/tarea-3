@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import axes3d
+import matplotlib.animation as animation
 
 n_puntos=300
 
@@ -10,14 +10,15 @@ y=np.linspace(0.0,30.0,n_puntos)
 
 matriz=np.zeros((n_puntos,n_puntos))
 
-matriz[30,150]=-0.5
+matriz[100,150]=-0.5
 
 u_inicial=matriz #forma inicial de la onda
 
 c=1.0
 delta_x=x[1]-x[0]
 delta_y=y[1]-y[0]
-delta_t=0.100001 #con esto se cumple que gamma y beta sean menores de 1
+
+delta_t=0.05
 
 gamma=(c* delta_t)/delta_x
 beta=(c*delta_t)/delta_y
@@ -32,11 +33,10 @@ u_inicial[n_puntos-1]=0.0
 u_inicial[:,0]=0.0
 u_inicial[:,n_puntos-1]=0.0
 
-for i  in range(0,n_puntos):
-    if(i<=140):
-        u_inicial[rejilla_posicion,i]=0.0
-    if(i>=161):
-        u_inicial[rejilla_posicion,i]=0.0
+
+#u_inicial[rejilla_posicion]=0.0
+
+
 
 u_siguiente=np.zeros((n_puntos,n_puntos))
 
@@ -45,14 +45,10 @@ u_siguiente[n_puntos-1]=0.0
 u_siguiente[:,0]=0.0
 u_siguiente[:,n_puntos-1]=0.0
 
-for i  in range(0,n_puntos):
-    if(i<=140):
-        u_siguiente[rejilla_posicion,i]=0.0
-    if(i>=161):
-        u_siguiente[rejilla_posicion,i]=0.0
-
-
-
+#np.where((x<145)&(x>155))
+#u_siguiente[rejilla_posicion]=0.0
+  
+   
 for j in range(1,n_puntos-1):
     for i in range(1,n_puntos-1):
         u_siguiente[j,i]=0.5*( (gamma**2)*(u_inicial[j,i+1]-2.0*u_inicial[j,i]+u_inicial[j,i-1])+(beta**2)*(u_inicial[j+1,i]-2.0*u_inicial[j,i]+u_inicial[j-1,i])+2.0*u_inicial[j,i] )
@@ -62,10 +58,11 @@ u_presente=u_siguiente.copy()
 
 
 
+n_tiempo=400
 
-xGrid, yGrid=np.meshgrid(y,x)
+imagelist=[]
+imagelist.append(u_inicial)
 
-n_tiempo=60
 
 for l in range(n_tiempo):
     
@@ -76,29 +73,19 @@ for l in range(n_tiempo):
             
     u_pasado=u_presente.copy()
     u_presente=u_siguiente.copy()
+    
+    if(l%10==0):
+        imagelist.append(u_presente)
 
     if(l==30):
         
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
-        
-        ax.plot_wireframe(xGrid, yGrid, u_presente, rstride=1, cstride=1)
-        
-        ax.set_xlim(14,16)
-        ax.set_ylim(0,6)
-        
+        plt.imshow(u_presente,cmap='gray')
         plt.savefig('30.png')
         plt.close()
         
     if(l==(n_tiempo-1)):
         
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
-        
-        ax.plot_wireframe(xGrid,yGrid,u_presente)
-        ax.set_xlim(14,16)
-        ax.set_ylim(0,6)
-        
+        plt.imshow(u_presente)
         plt.savefig('60.png')
         plt.close()
 
@@ -106,7 +93,20 @@ for l in range(n_tiempo):
 
 
 
+fig=plt.figure()
 
+im=plt.imshow(imagelist[0],cmap=plt.get_cmap('jet'))
 
+def updatefig(i):
+    
+    im.set_array(imagelist[i])
+    
+    return [im]
+
+ani=animation.FuncAnimation(fig,updatefig,frames=range(20),interval=50,blit=True)
+
+plt.show()
+writer = ImageMagickFileWriter()
+ani.save('onda.mp4')
 
 
